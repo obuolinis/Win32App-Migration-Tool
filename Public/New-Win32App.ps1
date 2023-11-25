@@ -354,6 +354,11 @@ function New-Win32App {
             $paramsToPassIntuneWin.Add('SetupFile', $content.Install_CommandLine)
             if ($OverrideIntuneWin32FileName) { $paramsToPassIntuneWin.Add('OverrideIntuneWin32FileName', $OverrideIntuneWin32FileName) }
 
+            # If PSADT package and no OverrideIntuneWin32FileName passed, rename Intune package file to DeploymentType name
+            if ($content.Install_CommandLine -match "Deploy-Application" -and -not $OverrideIntuneWin32FileName) {
+                $paramsToPassIntuneWin.Add('OverrideIntuneWin32FileName', $content.DeploymentType_Name)
+            }
+            
             # Create the .intunewin file
             New-IntuneWin @paramsToPassIntuneWin
         }

@@ -63,6 +63,7 @@ function Get-AppInfo {
                 $applicationObject | Add-Member NoteProperty -Name Id -Value $application.Id
                 $applicationObject | Add-Member NoteProperty -Name LogicalName -Value $xmlContent.AppMgmtDigest.Application.LogicalName
                 $applicationObject | Add-Member NoteProperty -Name Name -Value $xmlContent.AppMgmtDigest.Application.title.'#text'
+                $applicationObject | Add-Member NoteProperty -Name DisplayName -Value $xmlContent.AppMgmtDigest.Application.DisplayInfo.Info.Title
                 $applicationObject | Add-Member NoteProperty -Name Description -Value $xmlContent.AppMgmtDigest.Application.DisplayInfo.Info.Description
                 $applicationObject | Add-Member NoteProperty -Name Publisher -Value $xmlContent.AppMgmtDigest.Application.DisplayInfo.Info.Publisher
                 $applicationObject | Add-Member NoteProperty -Name Version -Value $xmlContent.AppMgmtDigest.Application.DisplayInfo.Info.Version
@@ -83,10 +84,11 @@ function Get-AppInfo {
                 # Add IconData to last column for easy reading
                 $applicationObject | Add-Member NoteProperty -Name IconData -Value $xmlContent.AppMgmtDigest.Resources.Icon.Data
                 
-                Write-Log -Message ("Id = '{0}', LogicalName = '{1}', Name = '{2}',Description = '{3}', Publisher = '{4}', Version = '{5}', ReleaseDate = '{6}', InfoUrl = '{7}', Tags = '{8}', TotalDeploymentTypes = '{9}', IconId = '{10}', IconPath = '{11}', IconData '{12}'" -f `
+                Write-Log -Message ("Id = '{0}', LogicalName = '{1}', Name = '{2}', DisplayName = '{3}', Description = '{4}', Publisher = '{5}', Version = '{6}', ReleaseDate = '{7}', InfoUrl = '{8}', Tags = '{9}', TotalDeploymentTypes = '{10}', IconId = '{11}', IconPath = '{12}', IconData '{13}'" -f `
                         $application.Id, `
                         $xmlContent.AppMgmtDigest.Application.LogicalName, `
                         $xmlContent.AppMgmtDigest.Application.title.'#text', `
+                        $xmlContent.AppMgmtDigest.Application.DisplayInfo.Info.Title, `
                         $xmlContent.AppMgmtDigest.Application.DisplayInfo.Info.Description, `
                         $xmlContent.AppMgmtDigest.Application.DisplayInfo.Info.Publisher, `
                         $xmlContent.AppMgmtDigest.Application.DisplayInfo.Info.Version, `
