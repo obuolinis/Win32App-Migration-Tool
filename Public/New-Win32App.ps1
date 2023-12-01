@@ -251,6 +251,7 @@ function New-Win32App {
     Write-Log -Message "Calling 'Get-ContentFiles' function to grab deployment type content" -LogId $LogId
     Write-Host "Calling 'Get-ContentFiles' function to grab deployment type content" -ForegroundColor Cyan
             
+    $detectionMethods_Array = @()
     $content_Array = foreach ($deploymentType in $deploymentTypes_Array) { 
     
         # Build or reset a hash table of switch parameters to pass to the Get-ContentFiles function
@@ -265,6 +266,12 @@ function New-Win32App {
         $paramsToPassContent.Add('DeploymentTypeName', $deploymentType.Name)
         $paramsToPassContent.Add('InstallCommandLine', $deploymentType.InstallCommandLine)
 
+        # Calling function to grab deployment type detection methods
+        Write-Log -Message "Calling 'Get-DetectionMethods' function to grab deployment type detection methods" -LogId $LogId
+        Write-Host "Calling 'Get-DetectionMethods' function to grab deployment type detection methods" -ForegroundColor Cyan
+
+        $detectionMethods_Array += Get-DetectionMethods -ApplicationName $deploymentType.ApplicationName -DeploymentTypeName $deploymentType.Name
+        
         # If we have content, call the Get-ContentInfo function
         if ($deploymentType.InstallContent -or $deploymentType.UninstallContent) { Get-ContentInfo @paramsToPassContent }
     }
@@ -303,6 +310,9 @@ function New-Win32App {
 
     # Export deployment type information to CSV for reference
     Export-CsvDetails -Name 'DeploymentTypes' -Data $deploymentTypes_Array -Path $detailsFolder
+
+    # Export detection method information to CSV for reference
+    Export-CsvDetails -Name 'DetectionMethods' -Data $detectionMethods_Array -Path $detailsFolder
 
     # Export content information to CSV for reference
     Export-CsvDetails -Name 'Content' -Data $content_Array -Path $detailsFolder
@@ -349,7 +359,12 @@ function New-Win32App {
             
             # Build parameters to splat at the New-IntuneWin function
             $paramsToPassIntuneWin = @{}
-            $paramsToPassIntuneWin.Add('ContentFolder', $content.Install_Destination)
+            if ($DownloadContent) {
+                $paramsToPassIntuneWin.Add('ContentFolder', $content.Install_Destination)
+            }
+            else {
+                $paramsToPassIntuneWin.Add('ContentFolder', $content.Install_Source)
+            }
             $paramsToPassIntuneWin.Add('OutputFolder', (Join-Path -Path "$workingFolder_Root\Win32Apps" -ChildPath $content.Win32app_Destination))
             $paramsToPassIntuneWin.Add('SetupFile', $content.Install_CommandLine)
             if ($OverrideIntuneWin32FileName) { $paramsToPassIntuneWin.Add('OverrideIntuneWin32FileName', $OverrideIntuneWin32FileName) }
